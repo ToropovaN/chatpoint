@@ -24,6 +24,8 @@ type OpaqueWallType = {
   axis: string;
   min: number;
   max: number;
+  inverse: boolean;
+  modification: string | null;
 };
 
 export class Environment {
@@ -71,7 +73,7 @@ export class Environment {
 
     this._wallMaterial = new StandardMaterial("wallMaterial", this._scene);
     this._wallMaterial.diffuseTexture = new Texture(
-      "/textures/palette.png",
+      "/textures/mapTex.png",
       this._scene
     );
   }
@@ -127,14 +129,18 @@ export class Environment {
           axis: m.name[m.name.indexOf("]") + 1],
           min: parseFloat(getFragmentOfMeshName(m.name, "(", "/")),
           max: parseFloat(getFragmentOfMeshName(m.name, "/", ")")),
+          inverse: m.name.includes("inv"),
+          modification: null,
         };
+        if (m.name.includes("alw1")) newOpaqueWall.modification = "alw1";
+        if (m.name.includes("alw0")) newOpaqueWall.modification = "alw0";
         this._opaqueWalls.push(newOpaqueWall);
         const newMat = new StandardMaterial(
           "opaqueWallMaterial" + getFragmentOfMeshName(m.name, "[", "]"),
           this._scene
         );
         newMat.diffuseTexture = new Texture(
-          "/textures/palette.png",
+          "/textures/mapTex.png",
           this._scene
         );
         m.material = newMat;
@@ -205,9 +211,17 @@ export class Environment {
     //console.log(AvatarPos);
     this._opaqueWalls.forEach((wall) => {
       if (AvatarPos[wall.axis] > wall.min && AvatarPos[wall.axis] < wall.max) {
-        wall.mesh.material.alpha =
-          (AvatarPos[wall.axis] - wall.min) / (wall.max - wall.min);
-      } else wall.mesh.material.alpha = Number(AvatarPos[wall.axis] > wall.min);
+        wall.mesh.material.alpha = wall.inverse
+          ? 1 - (AvatarPos[wall.axis] - wall.min) / (wall.max - wall.min)
+          : (AvatarPos[wall.axis] - wall.min) / (wall.max - wall.min);
+      } else {
+        if (wall.modification === "alw1") wall.mesh.material.alpha = 1;
+        else if (wall.modification === "alw0") wall.mesh.material.alpha = 0;
+        else
+          wall.mesh.material.alpha = wall.inverse
+            ? Number(AvatarPos[wall.axis] < wall.max)
+            : Number(AvatarPos[wall.axis] > wall.min);
+      }
     });
   };
 }
