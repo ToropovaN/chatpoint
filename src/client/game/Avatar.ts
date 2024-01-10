@@ -120,37 +120,35 @@ export class Avatar extends Player {
       if (
         this._currMapSector === 0 &&
         this._camRoot.position.z > 45 &&
-        this._camRoot.position.z < 75 &&
-        this.mesh.position.x < -43
+        this._camRoot.position.z < 75
       ) {
         // камера отлетает у ближней стены
         this._camRoot.rotation.x = this.mesh.position.z / 112;
       } else this._camRoot.rotation.x = (25 * Math.PI) / 180;
 
       console.log(this.mesh.position);
-      if (this.mesh.position.z < 23.5) {
-        if (
-          this.mesh.position.x < -61 ||
-          this.mesh.position.x > 20.4
-          //this.mesh.position.z > -3.4 || // центральный блок
-          //(this.mesh.position.x < 17 && this.mesh.position.z > 9.8) || // кухня
-          //(this.mesh.position.x > 30 && this.mesh.position.z < -20) // кабинет
-        ) {
-          if (this._currMapSector !== 0) this.animateCamRot(0);
-        }
+      if (
+        (this.mesh.position.z < -3 &&
+          this.mesh.position.x > -61 &&
+          this.mesh.position.x < 9) ||
+        (this.mesh.position.z < -4.6 &&
+          this.mesh.position.x < 20.4 &&
+          this.mesh.position.x > -61)
+      ) {
+        if (this._currMapSector !== 1) this.animateCamRot(1);
+      }
+      //this.mesh.position.z > 3.4
+      else if (this._currMapSector !== 0) this.animateCamRot(0);
 
-        //this.mesh.position.z > 3.4
-        else if (this._currMapSector !== 1) this.animateCamRot(1);
-      }
-      if (this.mesh.position.z > 23.5) {
-        if (
-          (this.mesh.position.x < -43 || this.mesh.position.x > 20.4) &&
-          this._currMapSector !== 0
-        )
-          this.animateCamRot(0);
-        //else if (this.mesh.position.x > -43 && this._currMapSector !== 1)
-        // this.animateCamRot(1);
-      }
+      /*if (this.mesh.position.z > 23.5) {
+          if (
+            (this.mesh.position.x < -43 || this.mesh.position.x > 20.4) &&
+            this._currMapSector !== 0
+          )
+            this.animateCamRot(0);
+          //else if (this.mesh.position.x > -43 && this._currMapSector !== 1)
+          // this.animateCamRot(1);
+        }*/
 
       if (this._currMapSector === 0) this._camRoot.rotation.y = Math.PI;
       if (this._currMapSector === 1) this._camRoot.rotation.y = -1.5 * Math.PI;
