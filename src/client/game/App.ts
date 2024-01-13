@@ -215,7 +215,7 @@ class App {
     });
     //this._menuScene.detachControl();
     let scene = this._gameScene;
-    scene.clearColor = new Color4(0.01, 0.01, 0.15); // a color that fit the overall color scheme better
+    scene.clearColor = new Color4(0, 0, 0); // a color that fit the overall color scheme better
     let light0 = new HemisphericLight(
       "HemiLight",
       new Vector3(0.2, 0.7, 0.15),

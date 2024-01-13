@@ -114,7 +114,6 @@ export class Avatar extends Player {
         ),
         0.4
       );
-
       // Cam Rotation
       if (this._camRoot.position.y > 18) this._camRoot.position.y = 18; // камера не бывает выше потолка
       if (
@@ -126,32 +125,87 @@ export class Avatar extends Player {
         this._camRoot.rotation.x = this.mesh.position.z / 112;
       } else this._camRoot.rotation.x = (25 * Math.PI) / 180;
 
+      console.log(this._currMapSector);
       console.log(this.mesh.position);
+
+      //--- ручное управление поворотом ---
       if (
-        (this.mesh.position.z < -3 &&
-          this.mesh.position.x > -61 &&
-          this.mesh.position.x < 9) ||
-        (this.mesh.position.z < -4.6 &&
-          this.mesh.position.x < 20.4 &&
-          this.mesh.position.x > -61)
+        (this.mesh.position.z < 22 && this.mesh.position.x < -51) ||
+        (this.mesh.position.z > 22 && this.mesh.position.x < -77)
       ) {
-        if (this._currMapSector !== 1) this.animateCamRot(1);
-      }
-      //this.mesh.position.z > 3.4
-      else if (this._currMapSector !== 0) this.animateCamRot(0);
-
-      /*if (this.mesh.position.z > 23.5) {
+        //--- плавный поворот в прихожей ---
+        if (
+          this.mesh.position.z < 22 &&
+          this.mesh.position.x < -60 &&
+          this.mesh.position.x > -80
+        ) {
+          this._camRoot.rotation.y =
+            Math.PI + ((-80 - this.mesh.position.x) / 40) * Math.PI;
           if (
-            (this.mesh.position.x < -43 || this.mesh.position.x > 20.4) &&
-            this._currMapSector !== 0
-          )
-            this.animateCamRot(0);
-          //else if (this.mesh.position.x > -43 && this._currMapSector !== 1)
-          // this.animateCamRot(1);
-        }*/
+            this.mesh.position.x > -70 &&
+            this.mesh.position.z < 4 &&
+            this._currMapSector !== 1
+          ) {
+            this._currMapSector = 1;
+            this._environment.setRoofsOpacity(1);
+          } else if (this._currMapSector !== 0) {
+            this._currMapSector = 0;
+            this._environment.setRoofsOpacity(0);
+          }
+        } else if (this.mesh.position.z < 22) {
+          {
+            if (this.mesh.position.x > -61) {
+              this._currMapSector = 1;
+              this._camRoot.rotation.y = 0.5 * Math.PI;
+              this._environment.setRoofsOpacity(1);
+            } else {
+              this._currMapSector = 0;
+              this._environment.setRoofsOpacity(0);
+            }
+          }
+        } else {
+          this._currMapSector = 0;
+          this._camRoot.rotation.y = Math.PI;
+          this._environment.setRoofsOpacity(0);
+        }
+      }
 
-      if (this._currMapSector === 0) this._camRoot.rotation.y = Math.PI;
-      if (this._currMapSector === 1) this._camRoot.rotation.y = -1.5 * Math.PI;
+      //--- управление поворотом через animateCamRot ---
+      else {
+        this._environment.setRoofsOpacity(1);
+        if (
+          (this.mesh.position.x < -50 && this.mesh.position.z < 22) ||
+          (this.mesh.position.z < -3 &&
+            this.mesh.position.x > -50 &&
+            this.mesh.position.x < 9) ||
+          (this.mesh.position.z < -4.6 &&
+            this.mesh.position.x < 20.4 &&
+            this.mesh.position.x > -50)
+        ) {
+          if (this._currMapSector !== 1) {
+            this.animateCamRot(1);
+            this._environment.setRoofsOpacity(1);
+          }
+        } else if (this._currMapSector !== 0) {
+          this.animateCamRot(0);
+          this._environment.setRoofsOpacity(0);
+        }
+        if (this._currMapSector === 0) this._camRoot.rotation.y = Math.PI;
+        if (this._currMapSector === 1)
+          this._camRoot.rotation.y = -1.5 * Math.PI;
+      }
+
+      /*else {
+        if (this._currMapSector === 0) this._camRoot.rotation.y = Math.PI;
+        if (this._currMapSector === 1)
+          this._camRoot.rotation.y = -1.5 * Math.PI;
+      }
+      /*if (this.mesh.position.x < 20 && this.mesh.position.x > 0) {
+        this._camRoot.rotation.y = 0.5 * Math.PI + ((0 - this.mesh.position.x) / 40) * Math.PI
+      }*/
+
+      //else if (this._currMapSector === 0) this._camRoot.rotation.y = Math.PI;
+      //else if (this._currMapSector === 1) this._camRoot.rotation.y = -1.5 * Math.PI;
     });
     return this.camera;
   }

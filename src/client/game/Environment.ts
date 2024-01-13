@@ -44,10 +44,15 @@ export class Environment {
 
   private _opaqueWalls: OpaqueWallType[] = [];
 
+  private _roofs = {
+    0: [],
+    1: [],
+  };
+
   constructor(scene: Scene) {
     this._scene = scene;
 
-    this._skyboxMaterial = new StandardMaterial("skyBox", scene);
+    /*this._skyboxMaterial = new StandardMaterial("skyBox", scene);
     this._skyboxMaterial.backFaceCulling = false;
     this._skyboxMaterial.reflectionTexture = new CubeTexture(
       "/textures/Sky",
@@ -57,7 +62,7 @@ export class Environment {
       Texture.SKYBOX_MODE;
     this._skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
     this._skyboxMaterial.specularColor = new Color3(0, 0, 0);
-    this._skyboxMaterial.disableLighting = true;
+    this._skyboxMaterial.disableLighting = true;*/
 
     this._floorMaterial = new StandardMaterial("_floorMaterial", this._scene);
     this._floorMaterial.diffuseTexture = new Texture(
@@ -120,6 +125,20 @@ export class Environment {
         m.material = this._floorMaterial;
         //(m as Mesh).markVerticesDataAsUpdatable(VertexBuffer.NormalKind, true);
         //(m as Mesh).applyDisplacementMap("/textures/earth_DISP.jpg", 0, 10);
+      }
+
+      if (m.name.includes("roof0") || m.name.includes("roof1")) {
+        const newMat = new StandardMaterial(
+          "opaqueWallMaterial" + getFragmentOfMeshName(m.name, "[", "]"),
+          this._scene
+        );
+        newMat.diffuseTexture = new Texture(
+          "/textures/mapTex.png",
+          this._scene
+        );
+        m.material = newMat;
+        if (m.name.includes("roof0")) this._roofs[0].push(m);
+        if (m.name.includes("roof1")) this._roofs[1].push(m);
       }
 
       if (m.name.includes("opaqueWall")) {
@@ -212,7 +231,6 @@ export class Environment {
   }
 
   setOpacityFromAvatarPos = (AvatarPos) => {
-    //console.log(AvatarPos);
     this._opaqueWalls.forEach((wall) => {
       if (AvatarPos[wall.axis] > wall.min && AvatarPos[wall.axis] < wall.max) {
         wall.mesh.material.alpha = wall.inverse
@@ -232,6 +250,14 @@ export class Environment {
             ? Number(AvatarPos[wall.axis] < wall.max)
             : Number(AvatarPos[wall.axis] > wall.min);
       }
+    });
+  };
+  setRoofsOpacity = (roofIndex) => {
+    Object.keys(this._roofs).forEach((index) => {
+      if (roofIndex == index) {
+        this._roofs[index].forEach((roofMesh) => (roofMesh.material.alpha = 0));
+      } else
+        this._roofs[index].forEach((roofMesh) => (roofMesh.material.alpha = 1));
     });
   };
 }
