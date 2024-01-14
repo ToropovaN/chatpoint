@@ -39,7 +39,8 @@ export class Environment {
 
   private _skyboxMaterial;
   private _earthMaterial;
-  private _floorMaterial;
+  private _floorMaterial1;
+  private _floorMaterial2;
   private _wallMaterial;
 
   private _opaqueWalls: OpaqueWallType[] = [];
@@ -64,17 +65,38 @@ export class Environment {
     this._skyboxMaterial.specularColor = new Color3(0, 0, 0);
     this._skyboxMaterial.disableLighting = true;*/
 
-    this._floorMaterial = new StandardMaterial("_floorMaterial", this._scene);
-    this._floorMaterial.diffuseTexture = new Texture(
-      "/textures/floor.png",
+    this._floorMaterial1 = new StandardMaterial("_floorMaterial1", this._scene);
+    this._floorMaterial1.diffuseTexture = new Texture(
+      "/textures/floor1.png",
       this._scene
     );
-    this._floorMaterial.bumpTexture = new Texture(
-      "/textures/floor_NRM.jpg",
+    this._floorMaterial1.bumpTexture = new Texture(
+      "/textures/floor1_NRM.jpg",
       this._scene
     );
-    this._floorMaterial.diffuseColor = new Color3(0.96, 0.9, 0.79);
-    this._floorMaterial.bumpTexture.level = 0.2;
+    this._floorMaterial1.diffuseColor = new Color3(0.96, 0.9, 0.79);
+    this._floorMaterial1.bumpTexture.level = 0.2;
+    /*
+    this._floorMaterial2 = new StandardMaterial("_floorMaterial2", this._scene);
+    this._floorMaterial2.diffuseTexture = new Texture(
+      "/textures/floor2.png",
+      this._scene
+    );
+    this._floorMaterial1.bumpTexture = new Texture(
+      "/textures/floor1_NRM.jpg",
+      this._scene
+    );
+    this._floorMaterial1.diffuseColor = new Color3(0.96, 0.9, 0.79);
+    this._floorMaterial1.bumpTexture.level = 0.2;*/
+    /*this._floorMaterial2.diffuseTexture = new Texture(
+      "/textures/floor2.png",
+      this._scene
+    );
+    this._floorMaterial2.bumpTexture = new Texture(
+      "/textures/floor2_NRM.jpg",
+      this._scene
+    );
+    this._floorMaterial2.bumpTexture.level = 0.2;*/
 
     this._wallMaterial = new StandardMaterial("wallMaterial", this._scene);
     this._wallMaterial.diffuseTexture = new Texture(
@@ -121,11 +143,8 @@ export class Environment {
         //(m as Mesh).applyDisplacementMap("/textures/earth_DISP.jpg", 0, 10);
       }
 
-      if (m.name.includes("Floor")) {
-        m.material = this._floorMaterial;
-        //(m as Mesh).markVerticesDataAsUpdatable(VertexBuffer.NormalKind, true);
-        //(m as Mesh).applyDisplacementMap("/textures/earth_DISP.jpg", 0, 10);
-      }
+      if (m.name.includes("Floor1")) m.material = this._floorMaterial1;
+      if (m.name.includes("Floor2")) console.log(m.material);
 
       if (m.name.includes("roof0") || m.name.includes("roof1")) {
         const newMat = new StandardMaterial(

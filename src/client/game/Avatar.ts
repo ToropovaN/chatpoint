@@ -114,6 +114,13 @@ export class Avatar extends Player {
         ),
         0.4
       );
+      // Cam Position
+
+      if (this._camRoot.position.z < -25.5) this._camRoot.position.z = -25.5;
+      if (this._camRoot.position.z > 66.6) this._camRoot.position.z = 66.6;
+      if (this._camRoot.position.x < -109) this._camRoot.position.x = -109;
+      if (this._camRoot.position.x > 50) this._camRoot.position.x = 50;
+
       // Cam Rotation
       if (this._camRoot.position.y > 18) this._camRoot.position.y = 18; // камера не бывает выше потолка
       if (
@@ -125,8 +132,8 @@ export class Avatar extends Player {
         this._camRoot.rotation.x = this.mesh.position.z / 112;
       } else this._camRoot.rotation.x = (25 * Math.PI) / 180;
 
-      console.log(this._currMapSector);
-      console.log(this.mesh.position);
+      //console.log(this._currMapSector);
+      console.log(this._camRoot.position);
 
       //--- ручное управление поворотом ---
       if (
@@ -141,12 +148,8 @@ export class Avatar extends Player {
         ) {
           this._camRoot.rotation.y =
             Math.PI + ((-80 - this.mesh.position.x) / 40) * Math.PI;
-          if (
-            this.mesh.position.x > -70 &&
-            this.mesh.position.z < 4 &&
-            this._currMapSector !== 1
-          ) {
-            this._currMapSector = 1;
+          if (this.mesh.position.x > -70 && this.mesh.position.z < 4) {
+            if (this._currMapSector !== 1) this._currMapSector = 1;
             this._environment.setRoofsOpacity(1);
           } else if (this._currMapSector !== 0) {
             this._currMapSector = 0;
