@@ -39,8 +39,7 @@ export class Environment {
 
   private _skyboxMaterial;
   private _earthMaterial;
-  private _floorMaterial1;
-  private _floorMaterial2;
+  private _floorMaterial;
   private _wallMaterial;
 
   private _opaqueWalls: OpaqueWallType[] = [];
@@ -65,38 +64,17 @@ export class Environment {
     this._skyboxMaterial.specularColor = new Color3(0, 0, 0);
     this._skyboxMaterial.disableLighting = true;*/
 
-    this._floorMaterial1 = new StandardMaterial("_floorMaterial1", this._scene);
-    this._floorMaterial1.diffuseTexture = new Texture(
+    this._floorMaterial = new StandardMaterial("_floorMaterial", this._scene);
+    this._floorMaterial.diffuseTexture = new Texture(
       "/textures/floor1.png",
       this._scene
     );
-    this._floorMaterial1.bumpTexture = new Texture(
+    this._floorMaterial.bumpTexture = new Texture(
       "/textures/floor1_NRM.jpg",
       this._scene
     );
-    this._floorMaterial1.diffuseColor = new Color3(0.96, 0.9, 0.79);
-    this._floorMaterial1.bumpTexture.level = 0.2;
-    /*
-    this._floorMaterial2 = new StandardMaterial("_floorMaterial2", this._scene);
-    this._floorMaterial2.diffuseTexture = new Texture(
-      "/textures/floor2.png",
-      this._scene
-    );
-    this._floorMaterial1.bumpTexture = new Texture(
-      "/textures/floor1_NRM.jpg",
-      this._scene
-    );
-    this._floorMaterial1.diffuseColor = new Color3(0.96, 0.9, 0.79);
-    this._floorMaterial1.bumpTexture.level = 0.2;*/
-    /*this._floorMaterial2.diffuseTexture = new Texture(
-      "/textures/floor2.png",
-      this._scene
-    );
-    this._floorMaterial2.bumpTexture = new Texture(
-      "/textures/floor2_NRM.jpg",
-      this._scene
-    );
-    this._floorMaterial2.bumpTexture.level = 0.2;*/
+    this._floorMaterial.diffuseColor = new Color3(0.96, 0.9, 0.79);
+    this._floorMaterial.bumpTexture.level = 0.2;
 
     this._wallMaterial = new StandardMaterial("wallMaterial", this._scene);
     this._wallMaterial.diffuseTexture = new Texture(
@@ -143,8 +121,7 @@ export class Environment {
         //(m as Mesh).applyDisplacementMap("/textures/earth_DISP.jpg", 0, 10);
       }
 
-      if (m.name.includes("Floor1")) m.material = this._floorMaterial1;
-      if (m.name.includes("Floor2")) console.log(m.material);
+      if (m.name.includes("Floor1")) m.material = this._floorMaterial;
 
       if (m.name.includes("roof0") || m.name.includes("roof1")) {
         const newMat = new StandardMaterial(
@@ -160,7 +137,7 @@ export class Environment {
         if (m.name.includes("roof1")) this._roofs[1].push(m);
       }
 
-      if (m.name.includes("opaqueWall")) {
+      if (m.name.includes("opaqueWall") || m.name.includes("buildingWall")) {
         // меши с прозрачностью называть по шаблону opaqueWall[<индекс>]<ось>(<позиция для alpha = 1>/<позиция для alpha = 0>)
         const newOpaqueWall = {
           mesh: m,
@@ -181,10 +158,25 @@ export class Environment {
           "opaqueWallMaterial" + getFragmentOfMeshName(m.name, "[", "]"),
           this._scene
         );
-        newMat.diffuseTexture = new Texture(
-          "/textures/mapTex.png",
-          this._scene
-        );
+
+        if (m.name.includes("buildingWall")) {
+          newMat.diffuseTexture = new Texture(
+            "/textures/buildingTex.png",
+            this._scene
+          );
+          newMat.bumpTexture = new Texture(
+            "/textures/buildingTex_NRM.jpg",
+            this._scene
+          );
+          newMat.bumpTexture.level = 0.6;
+          newMat.alpha = 0;
+        } else {
+          newMat.diffuseTexture = new Texture(
+            "/textures/mapTex.png",
+            this._scene
+          );
+        }
+
         m.material = newMat;
         m.checkCollisions = true;
       }

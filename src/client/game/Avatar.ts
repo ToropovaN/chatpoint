@@ -114,6 +114,9 @@ export class Avatar extends Player {
         ),
         0.4
       );
+
+      console.log(this.mesh.position);
+
       // Cam Position
 
       if (this._camRoot.position.z < -25.5) this._camRoot.position.z = -25.5;
@@ -131,9 +134,6 @@ export class Avatar extends Player {
         // камера отлетает у ближней стены
         this._camRoot.rotation.x = this.mesh.position.z / 112;
       } else this._camRoot.rotation.x = (25 * Math.PI) / 180;
-
-      //console.log(this._currMapSector);
-      console.log(this._camRoot.position);
 
       //--- ручное управление поворотом ---
       if (
