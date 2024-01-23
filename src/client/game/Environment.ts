@@ -38,6 +38,8 @@ export class Environment {
   };
 
   private _skyboxMaterial;
+  private _skyboxMesh;
+
   private _earthMaterial;
   private _floorMaterial;
   private _wallMaterial;
@@ -52,7 +54,7 @@ export class Environment {
   constructor(scene: Scene) {
     this._scene = scene;
 
-    /*this._skyboxMaterial = new StandardMaterial("skyBox", scene);
+    this._skyboxMaterial = new StandardMaterial("skyBox", scene);
     this._skyboxMaterial.backFaceCulling = false;
     this._skyboxMaterial.reflectionTexture = new CubeTexture(
       "/textures/Sky",
@@ -62,7 +64,8 @@ export class Environment {
       Texture.SKYBOX_MODE;
     this._skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
     this._skyboxMaterial.specularColor = new Color3(0, 0, 0);
-    this._skyboxMaterial.disableLighting = true;*/
+    this._skyboxMaterial.disableLighting = true;
+    this._skyboxMaterial.emissiveColor = new Color3(0.2, 0.2, 0.2);
 
     this._floorMaterial = new StandardMaterial("_floorMaterial", this._scene);
     this._floorMaterial.diffuseTexture = new Texture(
@@ -73,7 +76,7 @@ export class Environment {
       "/textures/floor1_NRM.jpg",
       this._scene
     );
-    this._floorMaterial.diffuseColor = new Color3(0.96, 0.9, 0.79);
+    this._floorMaterial.diffuseColor = new Color3(0.92, 0.75, 0.5);
     this._floorMaterial.bumpTexture.level = 0.2;
 
     this._wallMaterial = new StandardMaterial("wallMaterial", this._scene);
@@ -137,7 +140,11 @@ export class Environment {
         if (m.name.includes("roof1")) this._roofs[1].push(m);
       }
 
-      if (m.name.includes("opaqueWall") || m.name.includes("buildingWall")) {
+      if (
+        m.name.includes("opaqueWall") ||
+        m.name.includes("buildingWall") ||
+        m.name.includes("door")
+      ) {
         // меши с прозрачностью называть по шаблону opaqueWall[<индекс>]<ось>(<позиция для alpha = 1>/<позиция для alpha = 0>)
         const newOpaqueWall = {
           mesh: m,
@@ -168,7 +175,7 @@ export class Environment {
             "/textures/buildingTex_NRM.jpg",
             this._scene
           );
-          newMat.bumpTexture.level = 0.6;
+          newMat.bumpTexture.level = 0.8;
           newMat.alpha = 0;
         } else {
           newMat.diffuseTexture = new Texture(
@@ -177,12 +184,23 @@ export class Environment {
           );
         }
 
+        if (m.name.includes("window")) newMat.alpha = 0;
+
         m.material = newMat;
         m.checkCollisions = true;
       }
 
       if (m.name.includes("skybox")) {
-        m.material = this._skyboxMaterial;
+        this._skyboxMesh = m;
+        this._skyboxMesh.material = this._skyboxMaterial;
+
+        this._scene.onBeforeRenderObservable.add(() => {
+          this._skyboxMesh.rotation = new Vector3(
+            0,
+            this._skyboxMesh.rotation.y + 0.00005,
+            0
+          );
+        });
       }
     });
 

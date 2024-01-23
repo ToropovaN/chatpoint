@@ -149,7 +149,8 @@ class App {
 
     let light1: HemisphericLight = new HemisphericLight(
       "light1",
-      new Vector3(1, 1, 0),
+      //new Vector3(1, 1, 0),
+      new Vector3(0, 0.9, 0.4),
       this._menuScene
     );
     this._menuScene.beforeRender = () => {
@@ -218,7 +219,7 @@ class App {
     scene.clearColor = new Color4(0, 0, 0); // a color that fit the overall color scheme better
     let light0 = new HemisphericLight(
       "HemiLight",
-      new Vector3(0.2, 0.7, 0.15),
+      new Vector3(0.02, 0.6, 0.06),
       scene
     );
 

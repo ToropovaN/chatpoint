@@ -120,20 +120,13 @@ export class Avatar extends Player {
       // Cam Position
 
       if (this._camRoot.position.z < -25.5) this._camRoot.position.z = -25.5;
-      if (this._camRoot.position.z > 66.6) this._camRoot.position.z = 66.6;
+      if (this._camRoot.position.z > 65) this._camRoot.position.z = 65;
       if (this._camRoot.position.x < -109) this._camRoot.position.x = -109;
       if (this._camRoot.position.x > 50) this._camRoot.position.x = 50;
 
       // Cam Rotation
       if (this._camRoot.position.y > 18) this._camRoot.position.y = 18; // камера не бывает выше потолка
-      if (
-        this._currMapSector === 0 &&
-        this._camRoot.position.z > 45 &&
-        this._camRoot.position.z < 75
-      ) {
-        // камера отлетает у ближней стены
-        this._camRoot.rotation.x = this.mesh.position.z / 112;
-      } else this._camRoot.rotation.x = (25 * Math.PI) / 180;
+      this._camRoot.rotation.x = (25 * Math.PI) / 180;
 
       //--- ручное управление поворотом ---
       if (
