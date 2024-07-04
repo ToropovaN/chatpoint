@@ -116,6 +116,7 @@ class App {
       { diameter: 60 },
       this._menuScene
     );
+    //const mesh = MeshBuilder.CreateBox();
     const menuSkyboxMaterial = new StandardMaterial(
       "MenuSkybox",
       this._menuScene
@@ -137,7 +138,7 @@ class App {
     let camera = new ArcRotateCamera(
       "camera1",
       Math.PI / 2,
-      Math.PI / 2,
+      Math.PI / 2.5,
       17.5,
       new Vector3(0, 2.5, 0),
       this._menuScene
@@ -150,7 +151,7 @@ class App {
     let light1: HemisphericLight = new HemisphericLight(
       "light1",
       //new Vector3(1, 1, 0),
-      new Vector3(0, 0.9, 0.4),
+      new Vector3(0, 0.5, 0.4),
       this._menuScene
     );
     this._menuScene.beforeRender = () => {
@@ -219,9 +220,16 @@ class App {
     scene.clearColor = new Color4(0, 0, 0); // a color that fit the overall color scheme better
     let light0 = new HemisphericLight(
       "HemiLight",
-      new Vector3(0.02, 0.6, 0.06),
+      new Vector3(-0.5, 1, -0.4),
       scene
     );
+    let light1 = new HemisphericLight(
+      "HemiLight",
+      new Vector3(0.7, 1, 1),
+      scene
+    );
+    light0.intensity = 0.62;
+    light1.intensity = 0.62;
 
     //--WHEN SCENE FINISHED LOADING--
     await scene.whenReadyAsync();

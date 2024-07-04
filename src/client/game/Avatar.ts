@@ -115,14 +115,12 @@ export class Avatar extends Player {
         0.4
       );
 
-      console.log(this.mesh.position);
-
       // Cam Position
 
       if (this._camRoot.position.z < -25.5) this._camRoot.position.z = -25.5;
       if (this._camRoot.position.z > 65) this._camRoot.position.z = 65;
       if (this._camRoot.position.x < -109) this._camRoot.position.x = -109;
-      if (this._camRoot.position.x > 50) this._camRoot.position.x = 50;
+      if (this._camRoot.position.x > 47) this._camRoot.position.x = 47;
 
       // Cam Rotation
       if (this._camRoot.position.y > 18) this._camRoot.position.y = 18; // камера не бывает выше потолка
@@ -220,6 +218,7 @@ export class Avatar extends Player {
 
   private _updateFromControls(): void {
     this._moveDirection = Vector3.Zero();
+    console.log(this.mesh.position)
 
     if (this.currentEmotion) {
       this._h = 0;

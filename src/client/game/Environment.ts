@@ -21,6 +21,7 @@ const getFragmentOfMeshName = (name, startChar, endChar?) => {
 
 type OpaqueWallType = {
   mesh: Mesh | AbstractMesh;
+  type: string;
   axis: string;
   min: number;
   max: number;
@@ -34,7 +35,12 @@ export class Environment {
   private _itemsMap = {
     tree1: null,
     tree2: null,
-    chair: null,
+    chair1: null,
+    chair2: null,
+    chair3: null,
+    chair4: null,
+    table1: null,
+    table2: null,
   };
 
   private _skyboxMaterial;
@@ -43,6 +49,9 @@ export class Environment {
   private _earthMaterial;
   private _floorMaterial;
   private _wallMaterial;
+  private _graphicMaterial1;
+  private _graphicMaterial2;
+  private _monitorMaterial;
 
   private _opaqueWalls: OpaqueWallType[] = [];
 
@@ -65,7 +74,7 @@ export class Environment {
     this._skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
     this._skyboxMaterial.specularColor = new Color3(0, 0, 0);
     this._skyboxMaterial.disableLighting = true;
-    this._skyboxMaterial.emissiveColor = new Color3(0.2, 0.2, 0.2);
+    //this._skyboxMaterial.emissiveColor = new Color3(0.3, 0.3, 0.3);
 
     this._floorMaterial = new StandardMaterial("_floorMaterial", this._scene);
     this._floorMaterial.diffuseTexture = new Texture(
@@ -76,7 +85,7 @@ export class Environment {
       "/textures/floor1_NRM.jpg",
       this._scene
     );
-    this._floorMaterial.diffuseColor = new Color3(0.92, 0.75, 0.5);
+    this._floorMaterial.diffuseColor = new Color3(0.82, 0.72, 0.53);
     this._floorMaterial.bumpTexture.level = 0.2;
 
     this._wallMaterial = new StandardMaterial("wallMaterial", this._scene);
@@ -84,6 +93,32 @@ export class Environment {
       "/textures/mapTex.png",
       this._scene
     );
+
+    this._graphicMaterial1 = new StandardMaterial(
+      "graphicMaterial1",
+      this._scene
+    );
+    this._graphicMaterial1.diffuseTexture = new Texture(
+      "/textures/graphic.png",
+      this._scene
+    );
+    this._graphicMaterial2 = new StandardMaterial(
+      "graphicMaterial2",
+      this._scene
+    );
+    this._graphicMaterial2.diffuseTexture = new Texture(
+      "/textures/graphic2.png",
+      this._scene
+    );
+    this._monitorMaterial = new StandardMaterial(
+      "monitorMaterial",
+      this._scene
+    );
+    this._monitorMaterial.diffuseTexture = new Texture(
+      "/textures/graphic2.png",
+      this._scene
+    );
+    this._monitorMaterial.emissiveColor = new Color3(1, 1, 1);
   }
 
   async load() {
@@ -95,6 +130,17 @@ export class Environment {
     );
     const env = mapResult.meshes[0];
     const nodes = mapResult.transformNodes;
+
+    await this.loadItem("tree1");
+    await this.loadItem("tree2");
+
+    await this.loadItem("chair1");
+    await this.loadItem("chair2");
+    await this.loadItem("chair3");
+    await this.loadItem("chair4");
+
+    await this.loadItem("table1");
+    await this.loadItem("table2");
 
     const allMeshes = env.getChildMeshes();
     allMeshes.forEach((m) => {
@@ -114,8 +160,28 @@ export class Environment {
       }
 
       if (m.name.includes("officeWall")) {
-        m.checkCollisions = true;
         m.material = this._wallMaterial;
+      }
+
+      if (m.name.includes("officeStuff")) {
+        m.checkCollisions = !m.name.includes("noCol");
+        m.isPickable = !m.name.includes("noCol");
+        m.material = this._wallMaterial;
+      }
+
+      if (m.name.includes("graphic_1")) {
+        m.checkCollisions = true;
+        m.material = this._graphicMaterial1;
+      }
+
+      if (m.name.includes("graphic_2")) {
+        m.checkCollisions = true;
+        m.material = this._graphicMaterial2;
+      }
+
+      if (m.name.includes("monitor")) {
+        m.checkCollisions = true;
+        m.material = this._monitorMaterial;
       }
 
       if (m.name.includes("Earth")) {
@@ -142,12 +208,14 @@ export class Environment {
 
       if (
         m.name.includes("opaqueWall") ||
+        m.name.includes("opaqueGraphic") ||
         m.name.includes("buildingWall") ||
         m.name.includes("door")
       ) {
         // меши с прозрачностью называть по шаблону opaqueWall[<индекс>]<ось>(<позиция для alpha = 1>/<позиция для alpha = 0>)
         const newOpaqueWall = {
           mesh: m,
+          type: m.name.includes("door") ? "door" : "wall",
           axis: m.name[m.name.indexOf("]") + 1],
           min: parseFloat(getFragmentOfMeshName(m.name, "(", "/")),
           max: parseFloat(getFragmentOfMeshName(m.name, "/", ")")),
@@ -177,6 +245,11 @@ export class Environment {
           );
           newMat.bumpTexture.level = 0.8;
           newMat.alpha = 0;
+        } else if (m.name.includes("opaqueGraphic")) {
+          newMat.diffuseTexture = new Texture(
+            "/textures/graphic.png",
+            this._scene
+          );
         } else {
           newMat.diffuseTexture = new Texture(
             "/textures/mapTex.png",
@@ -187,7 +260,8 @@ export class Environment {
         if (m.name.includes("window")) newMat.alpha = 0;
 
         m.material = newMat;
-        m.checkCollisions = true;
+        //m.checkCollisions = true;
+        m.checkCollisions = false;
       }
 
       if (m.name.includes("skybox")) {
@@ -197,17 +271,40 @@ export class Environment {
         this._scene.onBeforeRenderObservable.add(() => {
           this._skyboxMesh.rotation = new Vector3(
             0,
-            this._skyboxMesh.rotation.y + 0.00005,
+            this._skyboxMesh.rotation.y +
+              this._scene.getEngine().getDeltaTime() * 0.00001,
             0
           );
         });
       }
+
+      if (m.name.includes("skybox")) {
+        this._skyboxMesh = m;
+        this._skyboxMesh.material = this._skyboxMaterial;
+
+        this._scene.onBeforeRenderObservable.add(() => {
+          this._skyboxMesh.rotation = new Vector3(
+            0,
+            this._skyboxMesh.rotation.y +
+              this._scene.getEngine().getDeltaTime() * 0.00001,
+            0
+          );
+        });
+      }
+
+      if (m.name.includes("(item)")) {
+        let mName = getFragmentOfMeshName(m.name, ")", "[");
+        m.isVisible = false;
+        m.checkCollisions = true;
+        m.isPickable = true;
+
+        if (this._itemsMap[mName]) {
+          let nMesh = this._itemsMap[mName].clone(m.name + "Mesh");
+          nMesh.position = m.getAbsolutePosition();
+          nMesh.rotationQuaternion = m.rotationQuaternion;
+        }
+      }
     });
-
-    await this.loadItem("tree1");
-    await this.loadItem("tree2");
-
-    await this.loadItem("chair");
 
     nodes.forEach((n) => {
       let nName = getFragmentOfMeshName(n.name, ")", "[");
@@ -215,11 +312,10 @@ export class Environment {
         let nMesh = this._itemsMap[nName].clone(n.name + "Mesh");
 
         nMesh.position = n.getAbsolutePosition();
+
         if (n.name.includes("_")) {
           let scale = parseFloat(getFragmentOfMeshName(n.name, "_", "/"));
-          let rotate = parseFloat(
-            n.name.substring(getFragmentOfMeshName(n.name, "/"))
-          );
+          let rotate = parseFloat(getFragmentOfMeshName(n.name, "/"));
 
           nMesh.scaling = new Vector3(scale, scale, scale);
           if (rotate > 0) {
@@ -271,13 +367,15 @@ export class Environment {
         ) {
           wall.mesh.material.alpha = wall.alwModification;
         }
-      } else {
-        if (wall.alwModification !== null)
-          wall.mesh.material.alpha = wall.alwModification;
-        else
-          wall.mesh.material.alpha = wall.inverse
-            ? Number(AvatarPos[wall.axis] < wall.max)
-            : Number(AvatarPos[wall.axis] > wall.min);
+      } else if (wall.alwModification !== null && wall.type === "wall")
+        wall.mesh.material.alpha = wall.alwModification;
+      else if (wall.alwModification !== null && wall.type === "door")
+        wall.mesh.material.alpha =
+          AvatarPos[wall.axis] > wall.min ? 1 : wall.alwModification;
+      else {
+        wall.mesh.material.alpha = wall.inverse
+          ? Number(AvatarPos[wall.axis] < wall.max)
+          : Number(AvatarPos[wall.axis] > wall.min);
       }
     });
   };
