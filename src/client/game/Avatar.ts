@@ -218,7 +218,7 @@ export class Avatar extends Player {
 
   private _updateFromControls(): void {
     this._moveDirection = Vector3.Zero();
-    console.log(this.mesh.position)
+    console.log(this.mesh.position);
 
     if (this.currentEmotion) {
       this._h = 0;

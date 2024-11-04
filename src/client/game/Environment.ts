@@ -39,8 +39,11 @@ export class Environment {
     chair2: null,
     chair3: null,
     chair4: null,
+    chair5: null,
+    chair6: null,
     table1: null,
     table2: null,
+    table3: null,
   };
 
   private _skyboxMaterial;
@@ -49,6 +52,7 @@ export class Environment {
   private _earthMaterial;
   private _floorMaterial;
   private _wallMaterial;
+  private _wallMaterialMat;
   private _graphicMaterial1;
   private _graphicMaterial2;
   private _monitorMaterial;
@@ -85,7 +89,9 @@ export class Environment {
       "/textures/floor1_NRM.jpg",
       this._scene
     );
-    this._floorMaterial.diffuseColor = new Color3(0.82, 0.72, 0.53);
+    this._floorMaterial.diffuseColor = new Color3(0.83, 0.7, 0.5);
+
+    console.log(this._floorMaterial.diffuseColor);
     this._floorMaterial.bumpTexture.level = 0.2;
 
     this._wallMaterial = new StandardMaterial("wallMaterial", this._scene);
@@ -93,6 +99,14 @@ export class Environment {
       "/textures/mapTex.png",
       this._scene
     );
+    this._wallMaterial.specularColor = new Color3(0.5, 0.5, 0.5);
+
+    this._wallMaterialMat = new StandardMaterial("wallMaterialM", this._scene);
+    this._wallMaterialMat.diffuseTexture = new Texture(
+      "/textures/mapTex.png",
+      this._scene
+    );
+    this._wallMaterialMat.specularColor = new Color3(0, 0, 0);
 
     this._graphicMaterial1 = new StandardMaterial(
       "graphicMaterial1",
@@ -138,9 +152,12 @@ export class Environment {
     await this.loadItem("chair2");
     await this.loadItem("chair3");
     await this.loadItem("chair4");
+    await this.loadItem("chair5");
+    await this.loadItem("chair6");
 
     await this.loadItem("table1");
     await this.loadItem("table2");
+    await this.loadItem("table3");
 
     const allMeshes = env.getChildMeshes();
     allMeshes.forEach((m) => {
@@ -166,16 +183,20 @@ export class Environment {
       if (m.name.includes("officeStuff")) {
         m.checkCollisions = !m.name.includes("noCol");
         m.isPickable = !m.name.includes("noCol");
-        m.material = this._wallMaterial;
+        m.material = m.name.includes("_mat")
+          ? this._wallMaterialMat
+          : this._wallMaterial;
       }
 
       if (m.name.includes("graphic_1")) {
-        m.checkCollisions = true;
+        m.checkCollisions = !m.name.includes("noCol");
+        m.isPickable = !m.name.includes("noCol");
         m.material = this._graphicMaterial1;
       }
 
       if (m.name.includes("graphic_2")) {
-        m.checkCollisions = true;
+        m.checkCollisions = !m.name.includes("noCol");
+        m.isPickable = !m.name.includes("noCol");
         m.material = this._graphicMaterial2;
       }
 
@@ -301,7 +322,9 @@ export class Environment {
         if (this._itemsMap[mName]) {
           let nMesh = this._itemsMap[mName].clone(m.name + "Mesh");
           nMesh.position = m.getAbsolutePosition();
-          nMesh.rotationQuaternion = m.rotationQuaternion;
+          nMesh.rotation = m.rotationQuaternion.toEulerAngles();
+          nMesh.rotation.y = -nMesh.rotation.y;
+          if (m.name === "(item)table1[48]") console.log(nMesh.rotation);
         }
       }
     });

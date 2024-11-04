@@ -230,6 +230,8 @@ class App {
     );
     light0.intensity = 0.62;
     light1.intensity = 0.62;
+    light0.specular = new Color3(0.55, 0.55, 0.55);
+    light1.specular = new Color3(0.55, 0.55, 0.55);
 
     //--WHEN SCENE FINISHED LOADING--
     await scene.whenReadyAsync();
