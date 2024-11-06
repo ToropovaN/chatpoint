@@ -52,7 +52,9 @@ class App {
   private _menuScene: Scene;
 
   constructor() {
-    this._canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
+    this._canvas = document.getElementById(
+      "gameCanvas"
+    ) as unknown as HTMLCanvasElement;
     this._engine = new Engine(this._canvas, true);
 
     const loaderScreen = document.querySelector(".loaderScreen") as HTMLElement;
