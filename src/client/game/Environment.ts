@@ -400,6 +400,13 @@ export class Environment {
           ? Number(AvatarPos[wall.axis] < wall.max)
           : Number(AvatarPos[wall.axis] > wall.min);
       }
+      if (
+        wall.mesh.name.includes("hallRoof") &&
+        AvatarPos.x < 17 &&
+        AvatarPos.x > -44 &&
+        AvatarPos.z > -3
+      )
+        wall.mesh.material.alpha = 1;
     });
   };
   setRoofsOpacity = (roofIndex) => {
