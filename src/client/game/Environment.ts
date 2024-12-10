@@ -10,6 +10,7 @@ import {
   CubeTexture,
   PBRMaterial,
   AbstractMesh,
+  VertexBuffer,
 } from "@babylonjs/core";
 
 const getFragmentOfMeshName = (name, startChar, endChar?) => {
@@ -17,6 +18,23 @@ const getFragmentOfMeshName = (name, startChar, endChar?) => {
     name.indexOf(startChar) + 1,
     endChar ? name.indexOf(endChar) : name.length
   );
+};
+
+const monitorTextureColumns = 4;
+const monitorTextureRows = 7;
+const monitorTexWidth = 1 / monitorTextureColumns;
+const monitorTexHeight = 1 / monitorTextureRows;
+
+const getMonitorUV = () => {
+  const randIndex = Math.floor(Math.random() * 28);
+  console.log(randIndex);
+  const row = Math.floor(randIndex / monitorTextureColumns);
+  const col = randIndex % monitorTextureColumns;
+  const x0 = col * monitorTexWidth;
+  const y0 = row * monitorTexHeight;
+  const x1 = x0 + monitorTexWidth;
+  const y1 = y0 + monitorTexHeight;
+  return [x0, y0, x1, y0, x0, y1, x1, y1];
 };
 
 type OpaqueWallType = {
@@ -33,8 +51,6 @@ export class Environment {
   private _scene: Scene;
 
   private _itemsMap = {
-    tree1: null,
-    tree2: null,
     chair1: null,
     chair2: null,
     chair3: null,
@@ -44,6 +60,10 @@ export class Environment {
     table1: null,
     table2: null,
     table3: null,
+    keyboard: null,
+    mouse: null,
+    monitor1: null,
+    monitor2: null,
   };
 
   private _skyboxMaterial;
@@ -55,7 +75,8 @@ export class Environment {
   private _wallMaterialMat;
   private _graphicMaterial1;
   private _graphicMaterial2;
-  private _monitorMaterial;
+  private _monitorMaterial1;
+  private _monitorMaterialManager;
 
   private _opaqueWalls: OpaqueWallType[] = [];
 
@@ -90,8 +111,6 @@ export class Environment {
       this._scene
     );
     this._floorMaterial.diffuseColor = new Color3(0.83, 0.7, 0.5);
-
-    console.log(this._floorMaterial.diffuseColor);
     this._floorMaterial.bumpTexture.level = 0.2;
 
     this._wallMaterial = new StandardMaterial("wallMaterial", this._scene);
@@ -124,15 +143,22 @@ export class Environment {
       "/textures/graphic2.png",
       this._scene
     );
-    this._monitorMaterial = new StandardMaterial(
+    this._monitorMaterial1 = new StandardMaterial(
       "monitorMaterial",
       this._scene
     );
-    this._monitorMaterial.diffuseTexture = new Texture(
+    this._monitorMaterial1.diffuseTexture = new Texture(
       "/textures/graphic2.png",
       this._scene
     );
-    this._monitorMaterial.emissiveColor = new Color3(1, 1, 1);
+    this._monitorMaterial1.emissiveColor = new Color3(1, 1, 1);
+    this._monitorMaterialManager = this._monitorMaterial1.clone(
+      "monitorMaterialManager"
+    );
+    this._monitorMaterialManager.diffuseTexture = new Texture(
+      "/textures/monitors/manager.png",
+      this._scene
+    );
   }
 
   async load() {
@@ -145,72 +171,27 @@ export class Environment {
     const env = mapResult.meshes[0];
     const nodes = mapResult.transformNodes;
 
-    await this.loadItem("tree1");
-    await this.loadItem("tree2");
-
-    await this.loadItem("chair1");
-    await this.loadItem("chair2");
-    await this.loadItem("chair3");
-    await this.loadItem("chair4");
-    await this.loadItem("chair5");
-    await this.loadItem("chair6");
-
-    await this.loadItem("table1");
-    await this.loadItem("table2");
-    await this.loadItem("table3");
+    for (const item in this._itemsMap) {
+      await this.loadItem(item);
+    }
 
     const allMeshes = env.getChildMeshes();
     allMeshes.forEach((m) => {
       m.receiveShadows = false;
-      m.checkCollisions = false;
-      m.isPickable = false;
-      m.isVisible = true;
+      m.checkCollisions = m.name.includes("Collision");
+      m.isPickable = m.name.includes("Collision");
+      m.isVisible = !m.name.includes("Collision");
 
-      if (m.name.includes("CollisionGround")) {
-        m.isVisible = false;
-        m.isPickable = true;
-        m.checkCollisions = true;
-      }
-      if (m.name.includes("CollisionWall")) {
-        m.isVisible = false;
-        m.checkCollisions = true;
-      }
-
-      if (m.name.includes("officeWall")) {
-        m.material = this._wallMaterial;
-      }
-
-      if (m.name.includes("officeStuff")) {
-        m.checkCollisions = !m.name.includes("noCol");
-        m.isPickable = !m.name.includes("noCol");
+      if (m.name.includes("officeWall")) m.material = this._wallMaterial;
+      if (m.name.includes("graphic_1")) m.material = this._graphicMaterial1;
+      if (m.name.includes("graphic_2")) m.material = this._graphicMaterial2;
+      if (m.name.includes("monitor")) m.material = this._monitorMaterial1;
+      if (m.name.includes("officeStuff"))
         m.material = m.name.includes("_mat")
           ? this._wallMaterialMat
           : this._wallMaterial;
-      }
 
-      if (m.name.includes("graphic_1")) {
-        m.checkCollisions = !m.name.includes("noCol");
-        m.isPickable = !m.name.includes("noCol");
-        m.material = this._graphicMaterial1;
-      }
-
-      if (m.name.includes("graphic_2")) {
-        m.checkCollisions = !m.name.includes("noCol");
-        m.isPickable = !m.name.includes("noCol");
-        m.material = this._graphicMaterial2;
-      }
-
-      if (m.name.includes("monitor")) {
-        m.checkCollisions = true;
-        m.material = this._monitorMaterial;
-      }
-
-      if (m.name.includes("Earth")) {
-        m.material = this._earthMaterial;
-        //(m as Mesh).markVerticesDataAsUpdatable(VertexBuffer.NormalKind, true);
-        //(m as Mesh).applyDisplacementMap("/textures/earth_DISP.jpg", 0, 10);
-      }
-
+      if (m.name.includes("Earth")) m.material = this._earthMaterial;
       if (m.name.includes("Floor1")) m.material = this._floorMaterial;
 
       if (m.name.includes("roof0") || m.name.includes("roof1")) {
@@ -281,7 +262,6 @@ export class Environment {
         if (m.name.includes("window")) newMat.alpha = 0;
 
         m.material = newMat;
-        //m.checkCollisions = true;
         m.checkCollisions = false;
       }
 
@@ -324,7 +304,18 @@ export class Environment {
           nMesh.position = m.getAbsolutePosition();
           nMesh.rotation = m.rotationQuaternion.toEulerAngles();
           nMesh.rotation.y = -nMesh.rotation.y;
-          if (m.name === "(item)table1[48]") console.log(nMesh.rotation);
+          if (mName === "monitor") {
+            const newData = getMonitorUV();
+            nMesh.setVerticesData(VertexBuffer.UVKind, newData, true);
+
+            const imgMesh = nMesh
+              .getChildMeshes()
+              .find((m) => m.name.includes("img"));
+            imgMesh.makeGeometryUnique();
+            imgMesh.setVerticesData(VertexBuffer.UVKind, newData, true);
+
+            console.log(mName);
+          }
         }
       }
     });
@@ -361,11 +352,13 @@ export class Environment {
     );
     let meshes = Result.meshes[0];
     meshes.getChildMeshes().forEach((m) => {
+      m.material = this._wallMaterial;
       m.checkCollisions = m.name.includes("Collision");
       m.isVisible = !m.name.includes("Collision");
       m.isPickable = m.name.includes("CollisionGround");
-      //m.checkCollisions = false;
-      //m.isPickable = false;
+      if (m.name.includes("monitor_img"))
+        m.material = this._monitorMaterialManager;
+
       if (m.name.includes("(light)")) {
         (m.material as StandardMaterial).emissiveColor = new Color3(1, 1, 1);
         (m.material as StandardMaterial).emissiveTexture = (

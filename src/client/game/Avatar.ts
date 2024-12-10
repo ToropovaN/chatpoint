@@ -28,6 +28,7 @@ export class Avatar extends Player {
 
   //const values
   private static readonly PLAYER_SPEED: number = 13;
+  private static readonly PLAYER_SPEED_RUN: number = 20;
   private static readonly JUMP_FORCE: number = 1.3;
   private static readonly GRAVITY: number = -3;
 
@@ -258,7 +259,11 @@ export class Avatar extends Player {
 
     //final movement that takes into consideration the inputs
     this._moveDirection = this._moveDirection.scaleInPlace(
-      this._inputAmt * Avatar.PLAYER_SPEED * this._deltaTime
+      this._inputAmt *
+        (this._input.runKeyDown
+          ? Avatar.PLAYER_SPEED_RUN
+          : Avatar.PLAYER_SPEED) *
+        this._deltaTime
     );
 
     //check if there is movement to determine if rotation is needed

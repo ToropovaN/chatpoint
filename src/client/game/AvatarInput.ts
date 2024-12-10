@@ -21,6 +21,7 @@ export class AvatarInput {
 
   //jumping and dashing
   public jumpKeyDown: boolean = false;
+  public runKeyDown: boolean = false;
 
   constructor(scene: Scene, mobileInput) {
     this._mobileInput = mobileInput;
@@ -67,6 +68,13 @@ export class AvatarInput {
     } else {
       this.horizontal = 0;
       this.horizontalAxis = 0;
+    }
+
+    //Run Checks (SHIFT)
+    if (this.inputMap[16]) {
+      this.runKeyDown = true;
+    } else {
+      this.runKeyDown = false;
     }
 
     //Jump Checks (SPACE)
