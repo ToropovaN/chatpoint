@@ -384,20 +384,16 @@ body {
   opacity: 1;
 }
 .constructorItem__Info {
-  overflow: hidden;
-  text-align: center;
-  width: 95%;
-  height: 100%;
-  padding-right: 5%;
+  color: var(--colorWhite);
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
+  padding-right: 5%;
+  height: 100%;
+  text-align: center;
 }
 .constructorItem__Pic {
-  pointer-events: none;
-  flex-shrink: 0;
-  display: inline-block;
   height: 100%;
   width: auto;
 }
@@ -405,15 +401,12 @@ body {
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--colorWhite);
   border-bottom: 1px solid var(--colorWhite);
-  margin-bottom: 5%;
-  padding-bottom: 5%;
 }
 .constructorItem__oneColor {
+  height: 30%;
   display: grid;
   width: 100%;
-  height: 30%;
 }
 .constructorItem__twoColors {
   width: 100%;

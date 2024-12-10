@@ -56,6 +56,7 @@ class App {
       "gameCanvas"
     ) as unknown as HTMLCanvasElement;
     this._engine = new Engine(this._canvas, true);
+    //this._engine.setHardwareScalingLevel(0.7);
 
     const loaderScreen = document.querySelector(".loaderScreen") as HTMLElement;
 

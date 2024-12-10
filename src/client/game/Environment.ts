@@ -64,6 +64,8 @@ export class Environment {
     mouse: null,
     monitor1: null,
     monitor2: null,
+    fan1: null,
+    fan2: null,
   };
 
   private _skyboxMaterial;
@@ -73,6 +75,7 @@ export class Environment {
   private _floorMaterial;
   private _wallMaterial;
   private _wallMaterialMat;
+  private _wallMaterialWithAlpha;
   private _graphicMaterial1;
   private _graphicMaterial2;
   private _monitorMaterial1;
@@ -126,6 +129,20 @@ export class Environment {
       this._scene
     );
     this._wallMaterialMat.specularColor = new Color3(0, 0, 0);
+
+    this._wallMaterialWithAlpha = new StandardMaterial(
+      "wallMaterialA",
+      this._scene
+    );
+    this._wallMaterialWithAlpha.diffuseTexture = new Texture(
+      "/textures/mapTex.png",
+      this._scene
+    );
+    this._wallMaterial.specularColor = new Color3(0.5, 0.5, 0.5);
+
+    this._wallMaterialWithAlpha.diffuseTexture.hasAlpha = true;
+    this._wallMaterialWithAlpha.useAlphaFromDiffuseTexture = true;
+    this._wallMaterialWithAlpha.needDepthPrePass = true;
 
     this._graphicMaterial1 = new StandardMaterial(
       "graphicMaterial1",
@@ -352,7 +369,10 @@ export class Environment {
     );
     let meshes = Result.meshes[0];
     meshes.getChildMeshes().forEach((m) => {
-      m.material = this._wallMaterial;
+      if (m.name.includes("_alpha")) {
+        console.log(m.name);
+        m.material = this._wallMaterialWithAlpha;
+      } else m.material = this._wallMaterial;
       m.checkCollisions = m.name.includes("Collision");
       m.isVisible = !m.name.includes("Collision");
       m.isPickable = m.name.includes("CollisionGround");
