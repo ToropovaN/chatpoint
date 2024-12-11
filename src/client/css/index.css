@@ -330,7 +330,7 @@ body {
   background-color: var(--colorAccent);
   border-radius: var(--sizeRadius) var(--sizeRadius) 0 0;
   border: 2px solid var(--colorAccent);
-  background-size: 100% auto;
+  background-size: 80% auto;
   background-repeat: no-repeat;
   background-position: center;
   transition: 0.3s;

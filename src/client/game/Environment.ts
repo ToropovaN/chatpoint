@@ -27,14 +27,13 @@ const monitorTexHeight = 1 / monitorTextureRows;
 
 const getMonitorUV = () => {
   const randIndex = Math.floor(Math.random() * 28);
-  console.log(randIndex);
   const row = Math.floor(randIndex / monitorTextureColumns);
   const col = randIndex % monitorTextureColumns;
   const x0 = col * monitorTexWidth;
   const y0 = row * monitorTexHeight;
   const x1 = x0 + monitorTexWidth;
   const y1 = y0 + monitorTexHeight;
-  return [x0, y0, x1, y0, x0, y1, x1, y1];
+  return [x0, y1, x1, y1, x0, y0, x1, y0];
 };
 
 type OpaqueWallType = {
@@ -64,8 +63,14 @@ export class Environment {
     mouse: null,
     monitor1: null,
     monitor2: null,
+    monitor3: null,
+    monitor4: null,
     fan1: null,
     fan2: null,
+    computer1: null,
+    computer2: null,
+    laptop1: null,
+    laptop2: null,
   };
 
   private _skyboxMaterial;
@@ -321,17 +326,14 @@ export class Environment {
           nMesh.position = m.getAbsolutePosition();
           nMesh.rotation = m.rotationQuaternion.toEulerAngles();
           nMesh.rotation.y = -nMesh.rotation.y;
-          if (mName === "monitor") {
+          if (mName.includes("monitor") || mName.includes("laptop")) {
             const newData = getMonitorUV();
             nMesh.setVerticesData(VertexBuffer.UVKind, newData, true);
-
             const imgMesh = nMesh
               .getChildMeshes()
               .find((m) => m.name.includes("img"));
             imgMesh.makeGeometryUnique();
             imgMesh.setVerticesData(VertexBuffer.UVKind, newData, true);
-
-            console.log(mName);
           }
         }
       }
@@ -369,10 +371,8 @@ export class Environment {
     );
     let meshes = Result.meshes[0];
     meshes.getChildMeshes().forEach((m) => {
-      if (m.name.includes("_alpha")) {
-        console.log(m.name);
-        m.material = this._wallMaterialWithAlpha;
-      } else m.material = this._wallMaterial;
+      if (m.name.includes("_alpha")) m.material = this._wallMaterialWithAlpha;
+      else m.material = this._wallMaterial;
       m.checkCollisions = m.name.includes("Collision");
       m.isVisible = !m.name.includes("Collision");
       m.isPickable = m.name.includes("CollisionGround");
