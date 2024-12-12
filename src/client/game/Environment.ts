@@ -270,6 +270,7 @@ export class Environment {
             nameSplit[nameSplit.length - 1]
           );
         }
+        newOpaqueWall.mesh.material.needDepthPrePass = true;
         this._opaqueWalls.push(newOpaqueWall);
         const newMat = new StandardMaterial(
           "opaqueWallMaterial" + getFragmentOfMeshName(m.name, "[", "]"),
