@@ -213,7 +213,8 @@ class App {
       this._avatarOuter.position = this._gameScene
         .getTransformNodeByName("startPosition")
         .getAbsolutePosition();
-      this._avatar.activateAvatarCamera();
+      this._environment.setOpacityFromAvatarPos(this._avatarOuter.position);
+      this._avatar.activateAvatarCamera(this._avatarOuter.position);
       this._avatar.activateAvatarInput(this._interface.mobileInput);
       this._avatar.startSendingPosition();
       this._interface.addEmotionsPnl(this._avatar);

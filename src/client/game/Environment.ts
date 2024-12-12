@@ -85,6 +85,8 @@ export class Environment {
   private _graphicMaterial2;
   private _monitorMaterial1;
   private _monitorMaterialManager;
+  private _monitorMaterialDesigner;
+  private _monitorMaterialDeveloper;
 
   private _opaqueWalls: OpaqueWallType[] = [];
 
@@ -174,11 +176,27 @@ export class Environment {
       this._scene
     );
     this._monitorMaterial1.emissiveColor = new Color3(1, 1, 1);
+
     this._monitorMaterialManager = this._monitorMaterial1.clone(
       "monitorMaterialManager"
     );
+    this._monitorMaterialDesigner = this._monitorMaterial1.clone(
+      "monitorMaterialDesigner"
+    );
+    this._monitorMaterialDeveloper = this._monitorMaterial1.clone(
+      "monitorMaterialDeveloper"
+    );
+
     this._monitorMaterialManager.diffuseTexture = new Texture(
-      "/textures/monitors/manager.png",
+      "/textures/monitors/mng.png",
+      this._scene
+    );
+    this._monitorMaterialDesigner.diffuseTexture = new Texture(
+      "/textures/monitors/des.png",
+      this._scene
+    );
+    this._monitorMaterialDeveloper.diffuseTexture = new Texture(
+      "/textures/monitors/dev.png",
       this._scene
     );
   }
@@ -326,12 +344,23 @@ export class Environment {
           nMesh.position = m.getAbsolutePosition();
           nMesh.rotation = m.rotationQuaternion.toEulerAngles();
           nMesh.rotation.y = -nMesh.rotation.y;
-          if (mName.includes("monitor") || mName.includes("laptop")) {
+          if (
+            (mName.includes("monitor") || mName.includes("laptop")) &&
+            !m.name.includes("-off")
+          ) {
             const newData = getMonitorUV();
             nMesh.setVerticesData(VertexBuffer.UVKind, newData, true);
             const imgMesh = nMesh
               .getChildMeshes()
               .find((m) => m.name.includes("img"));
+
+            if (m.name.includes("-dev"))
+              imgMesh.material = this._monitorMaterialDeveloper;
+            if (m.name.includes("-des"))
+              imgMesh.material = this._monitorMaterialDesigner;
+            if (m.name.includes("-mng"))
+              imgMesh.material = this._monitorMaterialDeveloper;
+
             imgMesh.makeGeometryUnique();
             imgMesh.setVerticesData(VertexBuffer.UVKind, newData, true);
           }
@@ -376,8 +405,6 @@ export class Environment {
       m.checkCollisions = m.name.includes("Collision");
       m.isVisible = !m.name.includes("Collision");
       m.isPickable = m.name.includes("CollisionGround");
-      if (m.name.includes("monitor_img"))
-        m.material = this._monitorMaterialManager;
 
       if (m.name.includes("(light)")) {
         (m.material as StandardMaterial).emissiveColor = new Color3(1, 1, 1);

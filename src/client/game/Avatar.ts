@@ -100,7 +100,8 @@ export class Avatar extends Player {
     return this.camera;
   }
 
-  public activateAvatarCamera(): UniversalCamera {
+  public activateAvatarCamera(startPos): UniversalCamera {
+    this._camRoot.position = startPos;
     this.scene.registerBeforeRender(() => {
       this._deltaTime = this.scene.getEngine().getDeltaTime() / 1000.0;
       this._updateFromControls();
