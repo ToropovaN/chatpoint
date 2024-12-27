@@ -360,7 +360,7 @@ export class Environment {
             if (m.name.includes("-des"))
               imgMesh.material = this._monitorMaterialDesigner;
             if (m.name.includes("-mng"))
-              imgMesh.material = this._monitorMaterialDeveloper;
+              imgMesh.material = this._monitorMaterialManager;
 
             imgMesh.makeGeometryUnique();
             imgMesh.setVerticesData(VertexBuffer.UVKind, newData, true);
