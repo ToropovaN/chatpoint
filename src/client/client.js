@@ -109,9 +109,7 @@ const interpolateCurrentState = (baseState, nextState) => {
 };
 
 const socketProtocol = "ws";
-const socket = io(`${socketProtocol}://${window.location.host}`, {
-  reconnection: false,
-});
+const socket = io();
 const connectedPromise = new Promise((resolve) => {
   socket.on("connect", () => {
     mySocketId = socket.id;
