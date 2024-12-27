@@ -4,8 +4,10 @@ const webpackDevMiddleware = require("webpack-dev-middleware");
 const socketio = require("socket.io");
 const WPConfig = require("../../webpack.config.js");
 
+const oneHour = 3600000;
+
 const app = express();
-app.use(express.static("public"));
+app.use(express.static("public", { maxAge: oneHour }));
 
 if (process.env.NODE_ENV === "development") {
   // Setup Webpack for development
@@ -13,7 +15,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(webpackDevMiddleware(compiler));
 } else {
   // Static serve the dist/ folder in production
-  app.use(express.static("dist"));
+  app.use(express.static("dist", { maxAge: oneHour }));
 }
 
 // Listen on port
